@@ -23,7 +23,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	input, err := logReader(os.Stdin)
+	input, err := worklogReader(os.Stdin)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -38,6 +38,7 @@ func main() {
 	}
 }
 
+// A list of all registered commands available by this program.
 var commands = map[string]func(input io.Reader, output io.Writer, args []string) error{
 	"filter":  cmdFilter,
 	"fmt":     cmdFmt,
@@ -45,6 +46,7 @@ var commands = map[string]func(input io.Reader, output io.Writer, args []string)
 	"add":     cmdAdd,
 }
 
+// availableCmds returns a sorted list of all available commands.
 func availableCmds() []string {
 	available := make([]string, 0, len(commands))
 	for name := range commands {
@@ -54,7 +56,10 @@ func availableCmds() []string {
 	return available
 }
 
-func logReader(r io.ReadCloser) (io.ReadCloser, error) {
+// worklogReader returns the reader of a worklog file. I first check if the
+// content is being piped and if not use the default location configured via
+// the WORKLOG environment variable.
+func worklogReader(r io.ReadCloser) (io.ReadCloser, error) {
 	if s, ok := r.(interface{ Stat() (os.FileInfo, error) }); ok {
 		if info, err := s.Stat(); err == nil {
 			if isPipe := (info.Mode() & os.ModeCharDevice) == 0; isPipe {
