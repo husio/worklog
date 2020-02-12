@@ -9,7 +9,7 @@ import (
 // ToText conver given entries into text format.
 func ToText(w io.Writer, entries []*Entry) error {
 	for _, e := range entries {
-		if _, err := fmt.Fprintln(w, e.Day.Format(timeFormat)); err != nil {
+		if _, err := fmt.Fprintln(w, e.Day.Format(TimeFormat)); err != nil {
 			return fmt.Errorf("write entry info: %w", err)
 		}
 		for _, t := range e.Tasks {

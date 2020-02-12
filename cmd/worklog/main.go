@@ -43,7 +43,7 @@ var commands = map[string]func(input io.Reader, output io.Writer, args []string)
 	"filter":  cmdFilter,
 	"fmt":     cmdFmt,
 	"summary": cmdSummary,
-	"add":     cmdAdd,
+	"open":    cmdOpen,
 }
 
 // availableCmds returns a sorted list of all available commands.
@@ -67,10 +67,14 @@ func worklogReader(r io.ReadCloser) (io.ReadCloser, error) {
 			}
 		}
 	}
-	path, ok := os.LookupEnv("WORKLOG")
-	if !ok {
-		path = filepath.Join(os.Getenv("HOME"), "/worklog.txt")
-	}
-	fd, err := os.Open(path)
+	fd, err := os.Open(worklogPath())
 	return fd, err
+}
+
+func worklogPath() string {
+	path, ok := os.LookupEnv("WORKLOG")
+	if ok {
+		return path
+	}
+	return filepath.Join(os.Getenv("HOME"), "/worklog.txt")
 }

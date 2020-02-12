@@ -32,7 +32,7 @@ func Parse(r io.Reader) ([]*Entry, error) {
 			continue
 		}
 
-		if t, err := time.Parse(timeFormat, line); err == nil {
+		if t, err := time.Parse(TimeFormat, line); err == nil {
 			if len(currentTask.Description) > 0 && len(currentEntry.Tasks) == 0 {
 				currentEntry.Tasks = append(currentEntry.Tasks, currentTask)
 			}
@@ -72,7 +72,7 @@ func firstWord(line string) (string, int) {
 	return line, len(line)
 }
 
-const timeFormat = "# 2 Jan 2006 Monday"
+var TimeFormat = env("WORKLOG_HEADER", "# 2 Jan 2006 Monday")
 
 type Entry struct {
 	Day   time.Time
