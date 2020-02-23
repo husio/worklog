@@ -23,7 +23,9 @@ func Parse(r io.Reader) ([]*Entry, error) {
 		case nil:
 			// all good
 		case io.EOF:
-			return entries, nil
+			if line == "" {
+				return entries, nil
+			}
 		default:
 			return nil, fmt.Errorf("read line: %w", err)
 		}
@@ -77,6 +79,14 @@ var TimeFormat = env("WORKLOG_HEADER", "# 2 Jan 2006 Monday")
 type Entry struct {
 	Day   time.Time
 	Tasks []*Task
+}
+
+func (e *Entry) TotalDuration() time.Duration {
+	var total time.Duration
+	for _, t := range e.Tasks {
+		total += t.Duration
+	}
+	return total
 }
 
 type Task struct {
