@@ -1,7 +1,8 @@
 GIT_COMMIT=$(shell git rev-list -1 HEAD)
 
 worklog:
-	CGO_ENABLED=0 go build -o bin/worklog -ldflags "-X main.GitCommit=$(GIT_COMMIT) -linkmode external -extldflags -static" github.com/husio/worklog/cmd/worklog
+	@# CGO_ENABLED=0 go build -o bin/worklog -ldflags "-X main.GitCommit=$(GIT_COMMIT) -linkmode external -extldflags -static" github.com/husio/worklog/cmd/worklog
+	CGO_ENABLED=0 go build -o bin/worklog -ldflags "-X main.GitCommit=$(GIT_COMMIT)" github.com/husio/worklog/cmd/worklog
 
 help:
 	@echo
