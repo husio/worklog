@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -12,8 +13,13 @@ import (
 	"github.com/husio/worklog/wlog"
 )
 
-func cmdOpen(input io.Reader, output io.Writer, args []string) error {
+func cmdOpen(_ io.Reader, _ io.Writer, args []string) error {
 	// cmdOpen is a special command becuse it ignores provided IO
+
+	fl := flag.NewFlagSet("open", flag.ContinueOnError)
+	if err := fl.Parse(args); err != nil {
+		return fmt.Errorf("flag parse: %w", err)
+	}
 
 	if err := ensureTodaysHeader(); err != nil {
 		return fmt.Errorf("ensure header: %w", err)

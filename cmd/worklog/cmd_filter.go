@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"time"
@@ -10,13 +11,18 @@ import (
 )
 
 func cmdFilter(input io.Reader, output io.Writer, args []string) error {
-	if len(args) != 1 {
+	fl := flag.NewFlagSet("filter", flag.ContinueOnError)
+	if err := fl.Parse(args); err != nil {
+		return fmt.Errorf("flag parse: %w", err)
+	}
+
+	if len(fl.Args()) != 1 {
 		return errors.New("usage: fmt <month-name>")
 	}
 
-	m, ok := months[args[0]]
+	m, ok := months[fl.Args()[0]]
 	if !ok {
-		return fmt.Errorf("invalid month: %q", args[0])
+		return fmt.Errorf("invalid month: %q", fl.Args()[0])
 	}
 
 	entries, err := wlog.Parse(input)

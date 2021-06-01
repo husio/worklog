@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -12,12 +13,17 @@ import (
 )
 
 func cmdFmt(input io.Reader, output io.Writer, args []string) error {
+	fl := flag.NewFlagSet("fmt", flag.ContinueOnError)
+	if err := fl.Parse(args); err != nil {
+		return fmt.Errorf("flag parse: %w", err)
+	}
+
 	var format string
-	switch len(args) {
+	switch len(fl.Args()) {
 	case 0:
 		format = "txt"
 	case 1:
-		format = args[0]
+		format = fl.Args()[0]
 	default:
 		return fmt.Errorf("usage: fmt [<format>]")
 	}

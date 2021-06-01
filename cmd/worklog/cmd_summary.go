@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"time"
@@ -9,6 +10,11 @@ import (
 )
 
 func cmdSummary(input io.Reader, output io.Writer, args []string) error {
+	fl := flag.NewFlagSet("summary", flag.ContinueOnError)
+	if err := fl.Parse(args); err != nil {
+		return fmt.Errorf("flag parse: %w", err)
+	}
+
 	entries, err := wlog.Parse(input)
 	if err != nil {
 		return fmt.Errorf("parse log: %s", err)
