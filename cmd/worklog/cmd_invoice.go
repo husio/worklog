@@ -13,6 +13,9 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
+
+	"github.com/husio/worklog/wlog"
 )
 
 var (
@@ -75,15 +78,17 @@ PaymentIBAN       =
 PaymentBIC        =
 PaymentBankName   =
 
-ItemDescription   = Software development: 01.01.2020 – 30.01.2020
-ItemHours         = 123
 ItemRate          = 100
+ItemDescription   = Software development.
 
-InvoiceNumber     = 2020-01-1
-InvoiceDate       = 2020-01-30
+# Below entries are generated from the worklog if not provided.
+ItemHours         =
+InvoiceNumber     =
+InvoiceDate       =
 
 NoTax             = false
 
+# base64 encoded PNG image.
 SignatureBase64   =
 		`)
 		return nil
@@ -97,11 +102,17 @@ SignatureBase64   =
 	}
 	defer fd.Close()
 
-	if err := populateFrom(&tctx, fd); err != nil {
+	if err := populateFromConfig(&tctx, fd); err != nil {
 		return fmt.Errorf("cannot read configuration: %w", err)
 	}
 
-	tctx.ItemTotal = tctx.ItemHours * tctx.ItemRate
+	entries, err := wlog.Parse(input)
+	if err != nil {
+		return fmt.Errorf("parse log: %s", err)
+	}
+	if err := populateFromLog(&tctx, entries); err != nil {
+		return fmt.Errorf("cannot interpred log: %w", err)
+	}
 
 	var b bytes.Buffer
 	if err := tmpl.Execute(&b, tctx); err != nil {
@@ -119,7 +130,36 @@ SignatureBase64   =
 	return nil
 }
 
-func populateFrom(s interface{}, r io.Reader) error {
+func populateFromLog(c *TemplateContext, entries []*wlog.Entry) error {
+
+	if c.ItemHours == 0 {
+		var total time.Duration
+		for _, e := range entries {
+			total += e.TotalDuration()
+		}
+		c.ItemHours = int(total / time.Hour)
+	}
+
+	c.ItemTotal = c.ItemHours * c.ItemRate
+
+	last := entries[len(entries)-1]
+	if c.InvoiceDate == "" {
+		c.InvoiceDate = last.Day.Format("2006-01-02")
+	}
+	if c.InvoiceNumber == "" {
+		c.InvoiceNumber = last.Day.Format("2006-01-") + "-01"
+	}
+
+	first := entries[0]
+	c.ItemDescription += fmt.Sprintf("<br><em>(%s - %s)</em>",
+		first.Day.Format("02.01.2006"),
+		last.Day.Format("02.01.2006"),
+	)
+
+	return nil
+}
+
+func populateFromConfig(s interface{}, r io.Reader) error {
 	v := reflect.ValueOf(s).Elem()
 
 	rd := bufio.NewReader(r)
@@ -137,6 +177,12 @@ func populateFrom(s interface{}, r io.Reader) error {
 		if len(line) == 0 {
 			continue
 		}
+
+		// Ignore comments.
+		if line[0] == '#' {
+			continue
+		}
+
 		chunks := strings.SplitN(line, "=", 2)
 		name := strings.TrimSpace(chunks[0])
 
