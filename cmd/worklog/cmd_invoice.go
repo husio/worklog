@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	//go:embed cmd_render.html
+	//go:embed cmd_invoice.html
 	rawTmpl string
 	tmpl    = template.Must(template.New("").Parse(rawTmpl))
 )
@@ -46,8 +46,8 @@ type TemplateContext struct {
 	SignatureBase64 string
 }
 
-func cmdRender(input io.Reader, output io.Writer, args []string) error {
-	fl := flag.NewFlagSet("render", flag.ContinueOnError)
+func cmdInvoice(input io.Reader, output io.Writer, args []string) error {
+	fl := flag.NewFlagSet("invoice", flag.ContinueOnError)
 	confFl := fl.String("c", "config.txt", "Path to the configuration file.")
 	outFl := fl.String("o", "", "Output file. Stdout if not given.")
 	exConfFl := fl.Bool("g", false, "Generate an example configuration file.")
