@@ -11,7 +11,7 @@ import (
 func cmdSummary(input io.Reader, output io.Writer, args []string) error {
 	entries, err := wlog.Parse(input)
 	if err != nil {
-		return fmt.Errorf("parse log: %s\n", err)
+		return fmt.Errorf("parse log: %s", err)
 	}
 	var total time.Duration
 	for _, e := range entries {

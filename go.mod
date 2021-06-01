@@ -1,3 +1,3 @@
 module github.com/husio/worklog
 
-go 1.13
+go 1.16

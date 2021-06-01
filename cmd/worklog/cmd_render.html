@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+  <head>
+<style>/* http://meyerweb.com/eric/tools/css/reset/ v2.0 | 20110126 License: none (public domain) */ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; } /* HTML5 display-role reset for older browsers */ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; } body { line-height: 1; } ol, ul { list-style: none; } blockquote, q { quotes: none; } blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; } table { border-collapse: collapse; border-spacing: 0; }</style>
+<style>
+    html { background: #D6D6D6; font: 13px Roboto, Arial, sans-serif; padding: 2em;}
+    body{
+      background: #FFF;
+      box-sizing: border-box;
+      width: 21cm;
+      height: 29.7cm;
+      padding: 2em;
+      margin: 0 auto;
+      border: 1px solid #ADADAD;
+      position: relative;
+    }
+    h1 { font-size: 220%; padding: 0 0 1em 0; font-weight: bolder; }
+    h2 { font-size: 120%; padding: 0.3em 0.5em; margin: 2em 0 0.8em 0; font-weight: bolder; border-bottom: 1px solid black; background: #F5F5F5; }
+    table tr { line-height: 1.5em; }
+    table th { font-weight: bold; text-align: left; }
+    table th, table td { padding: 0 0.4em; }
+    .summary { position: absolute; top: 0; right: 0; }
+    .summary th { text-align: left; }
+    .summary td { text-align: left; }
+    p { margin: 2em 0; }
+    table.invoice-items  { width: 100%; }
+    table.invoice-items thead { border-bottom: 1px solid #A6A3A3; }
+    table.invoice-items tbody td { border-bottom: 1px solid #A6A3A3; padding: 1em 0.4em; }
+    table.invoice-items tfoot {  padding: 1.4em 0 0 0; }
+
+    @media print {
+      body, html{ background:#fff;margin:0;padding:0;width:100%;height:100%;border:none; }
+    }
+</style>
+  </head>
+  <body contenteditable="true">
+    <h1>Invoice</h1>
+
+    <table class="summary">
+      <tr>
+        <th>Page</th><td>1</td>
+      </tr>
+      <tr>
+        <th>Debtor</th><td>{{.Debtor}}</td>
+      </tr>
+      <tr>
+        <th>Invoice Number</th><td>{{.InvoiceNumber}}</td>
+      </tr>
+      <tr>
+        <th>Invoice Date</th><td>{{.InvoiceDate}}</td>
+      </tr>
+    </table>
+
+    <h2>To</h2>
+    <table>
+      <tr>
+        <th>Company</th><td>{{.ToCompany}}</td>
+      </tr>
+      <tr>
+        <th>Address</th><td><pre>{{.ToAddress}}</pre></td>
+      </tr>
+      <tr>
+        <th>c/o</th><td>{{.ToCo}}</td>
+      </tr>
+      <tr>
+        <th>VAT-ID</th><td>{{.ToVATID}}</td>
+      </tr>
+    </table>
+
+    <h2>From</h2>
+    <table>
+      <tr>
+        <th>Name</th><td>{{.FromName}}</td>
+      </tr>
+      <tr>
+        <th>Address</th><td><pre>{{.FromAddress}}</pre></td>
+      </tr>
+      <tr>
+        <th>Country</th><td>{{.FromCountry}}</td>
+      </tr>
+      <tr>
+        <th>VAT-ID</th><td>{{.FromVATID}}</td>
+      </tr>
+      {{if .FromEmail}}
+      <tr>
+        <th>Email</th><td>{{.FromEmail}}</td>
+      </tr>
+      {{end}}
+    </table>
+
+    <h2>Payment Information</h2>
+    <table>
+      <tr>
+        <th>Name</th><td>{{.PaymentName}}</td>
+      </tr>
+      <tr>
+        <th>IBAN</th><td>{{.PaymentIBAN}}</td>
+      </tr>
+      <tr>
+        <th>BIC</th><td>{{.PaymentBIC}}</td>
+      </tr>
+      <tr>
+        <th>Bank Name</th><td>{{.PaymentBankName}}</td>
+      </tr>
+    </table>
+
+
+    <h2>Details</h2>
+    <table class="invoice-items">
+      <thead>
+          <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Hours</th>
+            <th>Rate</th>
+            <th>Total</th>
+          </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>{{.ItemDescription}}</td>
+          <td>{{.ItemHours}}</td>
+          <td>{{.ItemRate}} €</td>
+          <td>{{.ItemTotal}} €</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th>TOTAL*</th>
+          <th></th>
+          <th>Due</th>
+          <th>{{.ItemTotal}} €</th>
+        </tr>
+      </tfoot>
+    </table>
+
+    {{if .NoTax}}
+      <p>Because of small businesses regulation (Section 19 para 1 german sales tax law - UStG -) no sales tax is accounted.</p>
+    {{end}}
+
+    <p>Thank you for your business!</p>
+    {{if .SignatureBase64}}
+      <img src="data:image/png;base64, {{.SignatureBase64}}">
+    {{end}}
+  </body>
+</html>

@@ -44,6 +44,7 @@ var commands = map[string]func(input io.Reader, output io.Writer, args []string)
 	"fmt":     cmdFmt,
 	"summary": cmdSummary,
 	"open":    cmdOpen,
+	"render":  cmdRender,
 }
 
 // availableCmds returns a sorted list of all available commands.
