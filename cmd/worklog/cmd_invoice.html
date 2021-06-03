@@ -121,8 +121,8 @@
           <td>1</td>
           <td>{{.ItemDescription}}</td>
           <td>{{.ItemHours}}</td>
-          <td>{{.ItemRate}} €</td>
-          <td>{{.ItemTotal}} €</td>
+          <td>{{.ItemRate | prettyNumber}} €</td>
+          <td>{{.ItemTotal | prettyNumber}} €</td>
         </tr>
       </tbody>
       <tfoot>
@@ -131,13 +131,13 @@
           <th>TOTAL*</th>
           <th></th>
           <th>Due</th>
-          <th>{{.ItemTotal}} €</th>
+          <th>{{.ItemTotal | prettyNumber}} €</th>
         </tr>
       </tfoot>
     </table>
 
-    {{if .NoTax}}
-      <p>Because of small businesses regulation (Section 19 para 1 german sales tax law - UStG -) no sales tax is accounted.</p>
+    {{if .BottomNote}}
+      <p>{{.BottomNote}}</p>
     {{end}}
 
     <p>Thank you for your business!</p>

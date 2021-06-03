@@ -21,7 +21,9 @@ import (
 var (
 	//go:embed cmd_invoice.html
 	rawTmpl string
-	tmpl    = template.Must(template.New("").Parse(rawTmpl))
+	tmpl    = template.Must(template.New("").Funcs(template.FuncMap{
+		"prettyNumber": prettyFormatNumberDE,
+	}).Parse(rawTmpl))
 )
 
 type TemplateContext struct {
@@ -45,7 +47,7 @@ type TemplateContext struct {
 	ItemHours       int
 	ItemRate        int
 	ItemTotal       int
-	NoTax           bool
+	BottomNote      string
 	SignatureBase64 string
 }
 
@@ -86,7 +88,10 @@ ItemHours         =
 InvoiceNumber     =
 InvoiceDate       =
 
-NoTax             = false
+
+# Any additional note to add at the bottom of the invoice. This might be for
+# example a "no tax" information.
+BottomNote        = Because of small businesses regulation (Section 19 para 1 german sales tax law - UStG -) no sales tax is accounted.
 
 # base64 encoded PNG image.
 SignatureBase64   =
@@ -212,4 +217,14 @@ func populateFromConfig(s interface{}, r io.Reader) error {
 		}
 
 	}
+}
+
+// prettyFormatNumberDE does a naive dot separation.
+func prettyFormatNumberDE(n int) string {
+	res := strconv.Itoa(n)
+	for i := 3; i < len(res); i += 3 {
+		res = res[:len(res)-i] + "." + res[len(res)-i:]
+		i++ // Extra dot.
+	}
+	return res
 }
