@@ -42,9 +42,10 @@ func main() {
 var commands = map[string]func(input io.Reader, output io.Writer, args []string) error{
 	"filter":  cmdFilter,
 	"fmt":     cmdFmt,
-	"summary": cmdSummary,
-	"open":    cmdOpen,
 	"invoice": cmdInvoice,
+	"open":    cmdOpen,
+	"push":    cmdPush,
+	"summary": cmdSummary,
 }
 
 // availableCmds returns a sorted list of all available commands.
