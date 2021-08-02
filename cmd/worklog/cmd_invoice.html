@@ -27,6 +27,8 @@
     table.invoice-items thead { border-bottom: 1px solid #A6A3A3; }
     table.invoice-items tbody td { border-bottom: 1px solid #A6A3A3; padding: 1em 0.4em; }
     table.invoice-items tfoot {  padding: 1.4em 0 0 0; }
+    .align-right { text-align: right; }
+    .align-center { text-align: center; }
 
     @media print {
       body, html{ background:#fff;margin:0;padding:0;width:100%;height:100%;border:none; }
@@ -111,27 +113,36 @@
           <tr>
             <th>Item</th>
             <th>Description</th>
-            <th>Hours</th>
+            <th class="align-center">Hours</th>
             <th>Rate</th>
-            <th>Total</th>
+            <th class="align-right">Total</th>
           </tr>
       </thead>
       <tbody>
         <tr>
           <td>1</td>
           <td>{{.ItemDescription}}</td>
-          <td>{{.ItemHours}}</td>
+          <td class="align-center">{{.ItemHours}}</td>
           <td>{{.ItemRate | prettyNumber}} €</td>
-          <td>{{.ItemTotal | prettyNumber}} €</td>
+          <td class="align-right">{{.ItemTotal | prettyNumber}} €</td>
         </tr>
+        {{if .VATPaymentPerc}}
+          <tr>
+            <td></td>
+            <td>VAT</td>
+            <td></td>
+            <td>{{.VATPaymentPerc}}%</td>
+            <td class="align-right">{{.VATTotal | prettyNumber}} €</td>
+          </tr>
+        {{end}}
       </tbody>
       <tfoot>
         <tr>
           <th></th>
-          <th>TOTAL*</th>
+          <th>TOTAL</th>
           <th></th>
           <th>Due</th>
-          <th>{{.ItemTotal | prettyNumber}} €</th>
+          <th class="align-right">{{.Total | prettyNumber}} €</th>
         </tr>
       </tfoot>
     </table>

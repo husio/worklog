@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"reflect"
 	"strconv"
@@ -46,9 +47,12 @@ type TemplateContext struct {
 	ItemDescription string
 	ItemHours       int
 	ItemRate        int
-	ItemTotal       int
+	ItemTotal       float64
 	BottomNote      string
 	SignatureBase64 string
+	VATPaymentPerc  int
+	VATTotal        float64
+	Total           float64
 }
 
 func cmdInvoice(input io.Reader, output io.Writer, args []string) error {
@@ -92,6 +96,9 @@ InvoiceDate       =
 # Any additional note to add at the bottom of the invoice. This might be for
 # example a "no tax" information.
 BottomNote        = Because of small businesses regulation (Section 19 para 1 german sales tax law - UStG -) no sales tax is accounted.
+
+# If an additional VAT payment must be included, specify here the % value of it. For example, 19% VAT value should be here as 19.
+VATPaymentPerc    = 0
 
 # base64 encoded PNG image.
 SignatureBase64   =
@@ -145,7 +152,11 @@ func populateFromLog(c *TemplateContext, entries []*wlog.Entry) error {
 		c.ItemHours = int(total / time.Hour)
 	}
 
-	c.ItemTotal = c.ItemHours * c.ItemRate
+	c.ItemTotal = float64(c.ItemHours * c.ItemRate)
+	if c.VATPaymentPerc > 0 {
+		c.VATTotal = c.ItemTotal * float64(c.VATPaymentPerc) / 100
+	}
+	c.Total = c.ItemTotal + c.VATTotal
 
 	last := entries[len(entries)-1]
 	if c.InvoiceDate == "" {
@@ -220,11 +231,29 @@ func populateFromConfig(s interface{}, r io.Reader) error {
 }
 
 // prettyFormatNumberDE does a naive dot separation.
-func prettyFormatNumberDE(n int) string {
-	res := strconv.Itoa(n)
-	for i := 3; i < len(res); i += 3 {
-		res = res[:len(res)-i] + "." + res[len(res)-i:]
-		i++ // Extra dot.
+func prettyFormatNumberDE(n interface{}) string {
+	switch n := n.(type) {
+	case int:
+		res := strconv.Itoa(n)
+		for i := 3; i < len(res); i += 3 {
+			res = res[:len(res)-i] + "." + res[len(res)-i:]
+			i++ // Extra dot.
+		}
+		return res + ",-"
+	case float64:
+		i := math.Trunc(n)
+		res := strconv.Itoa(int(i))
+		for i := 3; i < len(res); i += 3 {
+			res = res[:len(res)-i] + "." + res[len(res)-i:]
+			i++ // Extra dot.
+		}
+		if d := int(math.Ceil((n - i) * 100)); d > 0 {
+			res = fmt.Sprintf("%s,%0.2d", res, d)
+		} else {
+			res += ",-"
+		}
+		return res
+	default:
+		panic("unsupported type")
 	}
-	return res
 }
