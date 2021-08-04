@@ -1,0 +1,59 @@
+<!doctype html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<style>
+body,html { height: 100%; max-width: 1000px; font-family:monospace; margin: 0 auto; padding: 0;  }
+table { width: 100%; border-collapse: collapse; margin: 0 auto 10em auto; }
+table thead { font-size: 1.4em; background: #333; color: #ddd; }
+table thead th { padding: 6px 4px; min-height: 2em; text-align: left; }
+table tbody td {  border-bottom: 1px solid #ddd; padding: 0.2em 0.6em; }
+h2.month { text-align: center; margin: 4em 0 1em 0; }
+h2.month a { color: inherit; text-decoration: none;}
+ul { list-style: none; padding: 0; margin: 0; }
+ul li { padding: 8px 0; }
+.weekday-Mon, .weekday-Tue, .weekday-Wed, .weekday-Thu, .weekday-Fri { background: #F3F3F3; }
+.weekday-Sun, .weekday-Sat { background: #FFF; color: #6D6D6D;  }
+.nowrap { white-space:nowrap; }
+	</style>
+	<title>Worklog</title>
+</head>
+<body>
+{{range .Entries}}
+	{{- with $first := index . 0 -}}
+		<h2 class="month" id="{{$first.Day.Format "month-200602"}}">
+			<a href="#{{$first.Day.Format "month-200602"}}">
+				{{$first.Day.Month}} {{$first.Day.Year}}
+			</a>
+		</h2>
+	{{- end -}}
+<table>
+	<thead>
+		<tr>
+			<th scope="col">Day</th>
+			<th scope="col">Tasks</th>
+			<th scope="col" title="Total duration.">{{ . | hoursduration}}h</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{range .}}
+			<tr class="weekday-{{.Day.Format "Mon"}}">
+				<td class="nowrap">{{.Day.Format "2nd Monday"}}</td>
+				<td>
+					{{if .Tasks}}
+						<ul>
+						{{range .Tasks}}
+							<li>{{.Duration|narrowhours}} {{.Description}}</li>
+						{{end}}
+						</ul>
+					{{else}}
+						<ul><li>-</li></ul>
+					{{end}}
+				</td>
+				<td class="nowrap">{{.TotalDuration|narrowhours}}</td>
+			</tr>
+		{{end}}
+	</tbody>
+</table>
+{{end}}
+</body>
