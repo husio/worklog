@@ -4,6 +4,9 @@ worklog:
 	@# CGO_ENABLED=0 go build -o bin/worklog -ldflags "-X main.GitCommit=$(GIT_COMMIT) -linkmode external -extldflags -static" github.com/husio/worklog/cmd/worklog
 	CGO_ENABLED=0 go build -o bin/worklog -ldflags "-X main.GitCommit=$(GIT_COMMIT)" github.com/husio/worklog/cmd/worklog
 
+install: worklog
+	cp bin/worklog $(HOME)/.bin/worklog
+
 help:
 	@echo
 	@echo "Commands"
@@ -16,4 +19,4 @@ help:
 	@echo
 	@echo "tag: deploy with custom tag (default: empty or 'tainted')"
 
-.PHONY: worklog
+.PHONY: worklog install
