@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -69,8 +70,16 @@ func worklogReader(r io.ReadCloser) (io.ReadCloser, error) {
 			}
 		}
 	}
-	fd, err := os.Open(worklogPath())
-	return fd, err
+	pathOrURL := worklogPath()
+	if strings.HasPrefix(pathOrURL, "http://") || strings.HasPrefix(pathOrURL, "https://") {
+		resp, err := http.Get(pathOrURL)
+		if err != nil {
+			return nil, err
+		}
+		return resp.Body, nil
+	} else {
+		return os.Open(pathOrURL)
+	}
 }
 
 func worklogPath() string {

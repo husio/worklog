@@ -163,7 +163,7 @@ func populateFromLog(c *TemplateContext, entries []*wlog.Entry) error {
 		c.InvoiceDate = last.Day.Format("2006-01-02")
 	}
 	if c.InvoiceNumber == "" {
-		c.InvoiceNumber = last.Day.Format("2006-01-") + "-01"
+		c.InvoiceNumber = last.Day.Format("2006-01-") + "01"
 	}
 
 	first := entries[0]
