@@ -38,7 +38,7 @@ type TemplateContext struct {
 	FromName        string
 	FromAddress     string
 	FromCountry     string
-	FromVATID       string
+	FromTaxID       string
 	FromEmail       string
 	PaymentName     string
 	PaymentIBAN     string
@@ -76,7 +76,7 @@ ToVATID           =
 FromName          =
 FromAddress       =
 FromCountry       =
-FromVATID         =
+FromTaxID         =
 FromEmail         =
 
 PaymentName       =
